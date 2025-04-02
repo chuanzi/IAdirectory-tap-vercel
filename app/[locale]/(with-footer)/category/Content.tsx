@@ -25,6 +25,34 @@ const getEnglishContent = (content?: string): string => {
   return 'Advanced information analysis tool for data processing and research';
 };
 
+// Get English category name
+const getEnglishCategory = (categoryName?: string): string => {
+  if (!categoryName) return '';
+  if (!containsChinese(categoryName)) return categoryName;
+  
+  // Map of common Chinese category names to English
+  const categoryMap: Record<string, string> = {
+    '信息获取': 'Information Retrieval',
+    '信息整理': 'Information Organization',
+    '信息分析': 'Information Analysis',
+    '信息挖掘': 'Information Mining',
+    '知识管理': 'Knowledge Management',
+    '辅助决策': 'Decision Support',
+    '知识图谱': 'Knowledge Graph',
+    '数据可视化': 'Data Visualization'
+  };
+  
+  // Check if we have a direct mapping
+  for (const [chinese, english] of Object.entries(categoryMap)) {
+    if (categoryName.includes(chinese)) {
+      return english;
+    }
+  }
+  
+  // Default fallback
+  return 'General Tools';
+};
+
 export default function Content({
   headerTitle,
   navigationList,
@@ -41,10 +69,16 @@ export default function Content({
   route: string;
 }) {
   const t = useTranslations('Category');
+  
+  // Process header title to ensure it's in English
+  const processedTitle = containsChinese(headerTitle) ? getEnglishCategory(headerTitle) : headerTitle;
+  
+  // Process navigation list to ensure all content is in English
   const [dataList] = useState<WebNavigation[]>(
     navigationList?.map(item => ({
       ...item,
-      content: containsChinese(item.content) ? getEnglishContent(item.content) : item.content
+      content: containsChinese(item.content) ? getEnglishContent(item.content) : item.content,
+      title: containsChinese(item.title) ? (item.name || getEnglishContent(item.title)) : item.title
     })) || []
   );
 
@@ -99,7 +133,7 @@ export default function Content({
           </Link>{' '}
           /{' '}
           <h1 className='text-lg lg:text-xl'>
-            {headerTitle}
+            {processedTitle}
           </h1>
         </div>
         {dataList.length > 0 ? (
@@ -135,4 +169,4 @@ export default function Content({
       </div>
     </div>
   );
-}
+} 

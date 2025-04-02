@@ -33,32 +33,32 @@ export default function Footer() {
 
   const SupportLinks = [
     {
-      title: 'Chat o1',
-      href: 'https://chat4o.ai/',
+      title: 'Google Scholar',
+      href: 'https://scholar.google.com/',
     },
     {
-      title: 'Grok Image Generator',
-      href: 'https://grokimagegenerator.net/',
+      title: 'Connected Papers',
+      href: 'https://www.connectedpapers.com/',
     },
     {
-      title: 'Flux AI Image Generator',
-      href: 'https://flux-ai.io/',
+      title: 'ResearchGate',
+      href: 'https://www.researchgate.net/',
     },
     {
-      title: 'Photo to Video AI',
-      href: 'https://dreammachineai.online/',
+      title: 'Kaggle Datasets',
+      href: 'https://www.kaggle.com/datasets',
     },
     {
-      title: 'Flux Pro Image Generator',
-      href: 'https://flux-pro.net/',
+      title: 'Open Knowledge Foundation',
+      href: 'https://okfn.org/',
     },
     {
       title: t('tap4'),
-      href: 'https://tap4.ai/',
+      href: 'https://infoanalysis.directory/',
     },
     {
       title: t('tattoo'),
-      href: 'https://tattooai.design/',
+      href: 'https://www.data.gov/',
     },
   ];
 

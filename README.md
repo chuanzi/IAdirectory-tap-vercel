@@ -1,11 +1,92 @@
-# Open Source Tap4 AI Web UI
+# Information Analysis Tools Directory
 
-This is an open-source AI Tools Directory project from [Tap4 AI Tool Directory](https://tap4.ai). Our goal is to make it
-easy for everyone to have their own AI Tools Directory, to collect their favorite AI tool products. This project is very
-lightweight and easy to maintain, suitable for individual developers interested in AI navigation sites, and also
-suitable for learners interested in NextJs. Everyone is welcome to fork and star.
+A comprehensive directory of tools and resources for information retrieval, organization, processing, visualization, and analysis.
 
-[Simplified Chinese](https://github.com/6677-ai/tap4-ai-webui/blob/main/README.zh-CN.md) | English
+## Features
+
+- **Categorized Tools**: Browse tools organized by function and use case
+- **Detailed Information**: Get comprehensive details about each tool including features and use cases
+- **Search Functionality**: Find the exact tool you need for your information analysis tasks
+- **Responsive Design**: Works on desktop and mobile devices
+- **Multi-language Support**: Available in multiple languages
+
+## Tech Stack
+
+- Next.js 13 (App Router)
+- Tailwind CSS
+- Supabase
+- Next-intl for internationalization
+- TypeScript
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 16+ 
+- pnpm or npm
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/information-analysis-directory.git
+cd information-analysis-directory
+```
+
+2. Install dependencies
+```bash
+pnpm install
+# or
+npm install
+```
+
+3. Configure environment variables
+```bash
+cp .env.example .env.local
+```
+Edit `.env.local` and add your Supabase credentials.
+
+4. Run the development server
+```bash
+pnpm dev
+# or
+npm run dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Database Setup
+
+1. Create tables using the SQL scripts in the `db/supabase` directory
+2. Add data using the provided insertion scripts
+
+## How to update your content?
+
+### Manually Modify the Database
+
+Modify the data in the web_navigation table of Supabase. Please pay attention to the markdown format for tool details.
+
+### Using the Submission Form
+
+Users can submit new tools through the submission form. These are stored in the submit table and can be reviewed before being added to the main web_navigation table.
+
+## Deployment
+
+Deploy on Vercel:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fyourusername%2Finformation-analysis-directory)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+This project was converted from the Tap4 AI Tools Directory template into an Information Analysis Tools Directory.
 
 ## Support Tap4 AI in Product Hunt
 
