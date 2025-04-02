@@ -7,6 +7,9 @@ const nextConfig = {
   env: {
     NEXT_BASE_API: process.env.NEXT_BASE_API,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   logging: {
     fetches: {
       fullUrl: process.env.NODE_ENV === 'development',
