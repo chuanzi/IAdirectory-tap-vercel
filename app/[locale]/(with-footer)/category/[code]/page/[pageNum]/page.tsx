@@ -11,8 +11,8 @@ import Content from '../../Content';
 export const revalidate = RevalidateOneHour * 6;
 
 export async function generateMetadata({ params }: { params: { code: string; pageNum?: string } }): Promise<Metadata> {
-  const supabase = createServerComponentClient();
-  const { data: categoryList } = await supabase.from('navigation_category').select().eq('name', params.code);
+  const supabaseClient = await createServerComponentClient();
+  const { data: categoryList } = await supabaseClient.from('navigation_category').select().eq('name', params.code);
 
   if (!categoryList || !categoryList[0]) {
     notFound();
