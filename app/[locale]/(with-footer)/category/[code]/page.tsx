@@ -2,7 +2,7 @@
 
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { createClient } from '@/db/supabase/client';
+import { createServerComponentClient } from '@/db/supabase/client';
 
 import { InfoPageSize, RevalidateOneHour } from '@/lib/constants';
 
@@ -27,31 +27,37 @@ const getEnglishCategory = (name: string): string => {
     'social-analysis': 'Social Analysis',
     'business-analysis': 'Business Analysis',
     'knowledge-management': 'Knowledge Management',
-    'financial-analysis': 'Financial Analysis'
+    'financial-analysis': 'Financial Analysis',
   };
-  
-  return categoryMap[name] || name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+
+  return (
+    categoryMap[name] ||
+    name
+      .split('-')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  );
 };
 
 // Get English fallback for content
 const getEnglishContent = (content?: string): string => {
   if (!content) return 'Information analysis tool for efficient data processing and research';
   if (!containsChinese(content)) return content;
-  
+
   return 'Advanced information analysis tool for data processing and research';
 };
 
 export async function generateMetadata({ params }: { params: { code: string } }): Promise<Metadata> {
-  const supabase = createClient();
+  const supabase = createServerComponentClient();
   const { data: categoryList } = await supabase.from('navigation_category').select().eq('name', params.code);
 
   if (!categoryList || !categoryList[0]) {
     notFound();
   }
 
-  const categoryTitle = containsChinese(categoryList[0].title) 
-    ? getEnglishCategory(params.code) 
-    : (categoryList[0].title || getEnglishCategory(params.code));
+  const categoryTitle = containsChinese(categoryList[0].title)
+    ? getEnglishCategory(params.code)
+    : categoryList[0].title || getEnglishCategory(params.code);
 
   return {
     title: categoryTitle,
@@ -59,7 +65,7 @@ export async function generateMetadata({ params }: { params: { code: string } })
 }
 
 export default async function Page({ params }: { params: { code: string } }) {
-  const supabase = createClient();
+  const supabase = createServerComponentClient();
   const [{ data: categoryList }, { data: navigationList, count }] = await Promise.all([
     supabase.from('navigation_category').select().eq('name', params.code),
     supabase
@@ -74,15 +80,20 @@ export default async function Page({ params }: { params: { code: string } }) {
   }
 
   // Process category title to ensure it's in English
-  const categoryTitle = containsChinese(categoryList[0].title) 
-    ? getEnglishCategory(params.code) 
-    : (categoryList[0].title || getEnglishCategory(params.code));
+  const categoryTitle = containsChinese(categoryList[0].title)
+    ? getEnglishCategory(params.code)
+    : categoryList[0].title || getEnglishCategory(params.code);
 
   // Process navigation list to ensure all English content
-  const processedNavigationList = navigationList?.map(item => ({
+  const processedNavigationList = navigationList?.map((item) => ({
     ...item,
     content: containsChinese(item.content) ? getEnglishContent(item.content) : item.content,
-    title: containsChinese(item.title) ? item.name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : item.title
+    title: containsChinese(item.title)
+      ? item.name
+          .split('-')
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+      : item.title,
   }));
 
   return (

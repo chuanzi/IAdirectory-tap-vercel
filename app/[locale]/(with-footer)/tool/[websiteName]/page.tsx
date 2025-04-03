@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { createClient } from '@/db/supabase/client';
+import { createServerComponentClient } from '@/db/supabase/client';
 import { CircleArrowRight, FileSearch } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
@@ -13,7 +13,7 @@ export async function generateMetadata({
 }: {
   params: { locale: string; websiteName: string };
 }): Promise<Metadata> {
-  const supabase = createClient();
+  const supabase = createServerComponentClient();
   const t = await getTranslations({
     locale,
     namespace: 'Metadata.ai',
@@ -31,8 +31,7 @@ export async function generateMetadata({
 }
 
 // English fallback content if detail is empty or contains Chinese characters
-const getFallbackDetail = (toolName: string, toolTitle: string, content: string) => {
-  return `# ${toolTitle}
+const getFallbackDetail = (toolName: string, toolTitle: string) => `# ${toolTitle}
 
 ${toolTitle} is a powerful information analysis tool that helps users efficiently process and analyze data. 
 
@@ -46,7 +45,6 @@ ${toolTitle} is a powerful information analysis tool that helps users efficientl
 This tool is particularly useful for researchers, data analysts, and knowledge workers who need to process large amounts of information quickly and effectively.
 
 Visit their website to learn more about their specific capabilities and how they can enhance your information analysis workflow.`;
-};
 
 // Check if text contains Chinese characters
 const containsChinese = (text?: string): boolean => {
@@ -58,7 +56,7 @@ const containsChinese = (text?: string): boolean => {
 const getEnglishContent = (content?: string): string => {
   if (!content) return 'Information analysis tool for efficient data processing and research';
   if (!containsChinese(content)) return content;
-  
+
   return 'Advanced information analysis tool for data processing and research';
 };
 
@@ -66,63 +64,59 @@ const getEnglishContent = (content?: string): string => {
 const getEnglishCategoryName = (categoryName?: string): string => {
   if (!categoryName) return '';
   if (!containsChinese(categoryName)) return categoryName;
-  
+
   // Map of common Chinese category names to English
   const categoryMap: Record<string, string> = {
-    '信息获取': 'Information Retrieval',
-    '信息整理': 'Information Organization',
-    '信息分析': 'Information Analysis',
-    '信息挖掘': 'Information Mining',
-    '知识管理': 'Knowledge Management',
-    '辅助决策': 'Decision Support',
-    '知识图谱': 'Knowledge Graph',
-    '数据可视化': 'Data Visualization'
+    信息获取: 'Information Retrieval',
+    信息整理: 'Information Organization',
+    信息分析: 'Information Analysis',
+    信息挖掘: 'Information Mining',
+    知识管理: 'Knowledge Management',
+    辅助决策: 'Decision Support',
+    知识图谱: 'Knowledge Graph',
+    数据可视化: 'Data Visualization',
   };
-  
+
   // Check if we have a direct mapping
-  for (const [chinese, english] of Object.entries(categoryMap)) {
+  let result = 'General Tools';
+
+  Object.entries(categoryMap).forEach(([chinese, english]) => {
     if (categoryName.includes(chinese)) {
-      return english;
+      result = english;
     }
-  }
-  
-  // Default fallback
-  return 'General Tools';
+  });
+
+  return result;
 };
 
 export default async function Page({ params: { websiteName } }: { params: { websiteName: string } }) {
-  const supabase = createClient();
+  const supabase = createServerComponentClient();
   const t = await getTranslations('Startup.detail');
   const { data: dataList } = await supabase.from('web_navigation').select().eq('name', websiteName);
   if (!dataList) {
     notFound();
   }
   const data = dataList[0];
-  
+
   // Process all text content to ensure it's in English
   const title = containsChinese(data.title) ? data.name : data.title;
   const content = getEnglishContent(data.content);
   const categoryName = getEnglishCategoryName(data.category_name);
   const tagName = containsChinese(data.tag_name) ? 'Information Tool' : data.tag_name;
-  
+
   // Use fallback detail if the current detail is empty or contains Chinese
-  const displayDetail = (!data.detail || containsChinese(data.detail)) 
-    ? getFallbackDetail(data.name, title, content)
-    : data.detail;
+  const displayDetail =
+    !data.detail || containsChinese(data.detail) ? getFallbackDetail(data.name, title) : data.detail;
 
   return (
     <div className='w-full'>
       <div className='mx-auto max-w-5xl px-6 lg:px-8'>
-        <div className='flex flex-col py-5 lg:flex-row lg:gap-8 lg:justify-between lg:items-center lg:py-10'>
-          <div className='flex flex-col items-center lg:items-start lg:max-w-[50%]'>
+        <div className='flex flex-col py-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8 lg:py-10'>
+          <div className='flex flex-col items-center lg:max-w-[50%] lg:items-start'>
             <div className='space-y-1 text-balance lg:space-y-3'>
               <h1 className='text-2xl lg:text-5xl'>{title}</h1>
               <h2 className='text-xs lg:text-sm'>{content}</h2>
-              {tagName && (
-                <span className='inline-block rounded-md bg-white/10 px-2 py-1 text-xs'>
-                  {tagName}
-                </span>
-              )}
+              {tagName && <span className='inline-block rounded-md bg-white/10 px-2 py-1 text-xs'>{tagName}</span>}
               {categoryName && (
                 <span className='inline-block rounded-md bg-white/10 px-2 py-1 text-xs'>
                   Category: {categoryName.replace(/-/g, ' ')}
@@ -142,7 +136,7 @@ export default async function Page({ params: { websiteName } }: { params: { webs
             href={data.url}
             target='_blank'
             rel='noreferrer'
-            className='flex-center group relative h-[171px] w-full mt-6 flex-shrink-0 sm:w-[80%] sm:mx-auto md:w-[70%] lg:mt-0 lg:h-[234px] lg:w-[400px] xl:w-[466px]'
+            className='flex-center group relative mt-6 h-[171px] w-full flex-shrink-0 sm:mx-auto sm:w-[80%] md:w-[70%] lg:mt-0 lg:h-[234px] lg:w-[400px] xl:w-[466px]'
           >
             <div className='absolute inset-0 flex items-center justify-center rounded-[16px] border border-[#424242] bg-[#424242] bg-cover'>
               {data.thumbnail_url ? (
@@ -183,4 +177,4 @@ export default async function Page({ params: { websiteName } }: { params: { webs
       </div>
     </div>
   );
-} 
+}

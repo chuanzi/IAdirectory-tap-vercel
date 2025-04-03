@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { createClient } from '@/db/supabase/client';
+import { createServerComponentClient } from '@/db/supabase/client';
 import { CircleArrowRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
@@ -13,7 +13,7 @@ export async function generateMetadata({
 }: {
   params: { locale: string; websiteName: string };
 }): Promise<Metadata> {
-  const supabase = createClient();
+  const supabase = createServerComponentClient();
   const t = await getTranslations({
     locale,
     namespace: 'Metadata.ai',
@@ -31,7 +31,7 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params: { websiteName } }: { params: { websiteName: string } }) {
-  const supabase = createClient();
+  const supabase = createServerComponentClient();
   const t = await getTranslations('Startup.detail');
   const { data: dataList } = await supabase.from('web_navigation').select().eq('name', websiteName);
   if (!dataList) {

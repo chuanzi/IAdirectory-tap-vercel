@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { createClient } from '@/db/supabase/client';
+import { createServerComponentClient } from '@/db/supabase/client';
 import { CircleChevronRight } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
@@ -32,17 +32,17 @@ const getEnglishCategory = (name: string): string => {
     'business-analysis': 'Business Analysis',
     'knowledge-management': 'Knowledge Management',
     'financial-analysis': 'Financial Analysis',
-    '信息获取': 'Information Retrieval',
-    '信息整理': 'Information Organization',
-    '信息加工': 'Information Processing',
-    '信息可视化': 'Information Visualization',
-    '学术分析': 'Academic Research',
-    '社交分析': 'Social Analysis',
-    '商业分析': 'Business Analysis',
-    'AI知识管理': 'Knowledge Management',
-    '金融分析': 'Financial Analysis'
+    信息获取: 'Information Retrieval',
+    信息整理: 'Information Organization',
+    信息加工: 'Information Processing',
+    信息可视化: 'Information Visualization',
+    学术分析: 'Academic Research',
+    社交分析: 'Social Analysis',
+    商业分析: 'Business Analysis',
+    AI知识管理: 'Knowledge Management',
+    金融分析: 'Financial Analysis',
   };
-  
+
   return categoryMap[name] || name;
 };
 
@@ -50,7 +50,7 @@ const getEnglishCategory = (name: string): string => {
 const getEnglishContent = (content?: string): string => {
   if (!content) return 'Information analysis tool for efficient data processing and research';
   if (!containsChinese(content)) return content;
-  
+
   return 'Advanced information analysis tool for data processing and research';
 };
 
@@ -74,7 +74,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 export const revalidate = RevalidateOneHour;
 
 export default async function Page() {
-  const supabase = createClient();
+  const supabase = createServerComponentClient();
   const t = await getTranslations('Home');
   const [{ data: categoryList }, { data: navigationList }] = await Promise.all([
     supabase.from('navigation_category').select(),
@@ -82,15 +82,15 @@ export default async function Page() {
   ]);
 
   // Process category list to ensure all English titles
-  const processedCategoryList = categoryList?.map(item => ({
+  const processedCategoryList = categoryList?.map((item) => ({
     ...item,
-    title: containsChinese(item.title) ? getEnglishCategory(item.name) : (item.title || getEnglishCategory(item.name))
+    title: containsChinese(item.title) ? getEnglishCategory(item.name) : item.title || getEnglishCategory(item.name),
   }));
 
   // Process navigation list to ensure all English content
-  const processedNavigationList = navigationList?.map(item => ({
+  const processedNavigationList = navigationList?.map((item) => ({
     ...item,
-    content: containsChinese(item.content) ? getEnglishContent(item.content) : item.content
+    content: containsChinese(item.content) ? getEnglishContent(item.content) : item.content,
   }));
 
   return (

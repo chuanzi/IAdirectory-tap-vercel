@@ -1,4 +1,4 @@
-import { createClient } from '@/db/supabase/client';
+import { createServerComponentClient } from '@/db/supabase/client';
 
 import SearchForm from '@/components/home/SearchForm';
 import BasePagination from '@/components/page/BasePagination';
@@ -18,7 +18,7 @@ const containsChinese = (text?: string): boolean => {
 const getEnglishContent = (content?: string): string => {
   if (!content) return 'Information analysis tool for efficient data processing and research';
   if (!containsChinese(content)) return content;
-  
+
   return 'Advanced information analysis tool for data processing and research';
 };
 
@@ -26,17 +26,20 @@ const getEnglishContent = (content?: string): string => {
 const getEnglishTitle = (title?: string, name?: string): string => {
   if (!title) return name || 'Analysis Tool';
   if (!containsChinese(title)) return title;
-  
+
   // Return capitalized tool name if available
   if (name) {
-    return name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    return name
+      .split('-')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
-  
+
   return 'Information Analysis Tool';
 };
 
 export default async function ExploreList({ pageNum }: { pageNum?: string }) {
-  const supabase = createClient();
+  const supabase = createServerComponentClient();
   const currentPage = pageNum ? Number(pageNum) : 1;
 
   // start and end
@@ -51,20 +54,23 @@ export default async function ExploreList({ pageNum }: { pageNum?: string }) {
       .order('collection_time', { ascending: false })
       .range(start, end),
   ]);
-  
+
   // Process navigation list to ensure all content is in English
-  const processedNavigationList = navigationList?.map(item => ({
+  const processedNavigationList = navigationList?.map((item) => ({
     ...item,
     content: containsChinese(item.content) ? getEnglishContent(item.content) : item.content,
-    title: containsChinese(item.title) ? getEnglishTitle(item.title, item.name) : item.title
+    title: containsChinese(item.title) ? getEnglishTitle(item.title, item.name) : item.title,
   }));
 
   // Process category list to ensure all titles are in English
-  const processedCategoryList = categoryList?.map(item => ({
+  const processedCategoryList = categoryList?.map((item) => ({
     ...item,
-    title: containsChinese(item.title) ? 
-      item.name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') : 
-      item.title
+    title: containsChinese(item.title)
+      ? item.name
+          .split('-')
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+      : item.title,
   }));
 
   return (
