@@ -74,11 +74,11 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 export const revalidate = RevalidateOneHour;
 
 export default async function Page() {
-  const supabase = createServerComponentClient();
+  const supabaseClient = await createServerComponentClient();
   const t = await getTranslations('Home');
   const [{ data: categoryList }, { data: navigationList }] = await Promise.all([
-    supabase.from('navigation_category').select(),
-    supabase.from('web_navigation').select().order('collection_time', { ascending: false }).limit(12),
+    supabaseClient.from('navigation_category').select(),
+    supabaseClient.from('web_navigation').select().order('collection_time', { ascending: false }).limit(12),
   ]);
 
   // Process category list to ensure all English titles

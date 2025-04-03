@@ -39,7 +39,7 @@ const getEnglishTitle = (title?: string, name?: string): string => {
 };
 
 export default async function ExploreList({ pageNum }: { pageNum?: string }) {
-  const supabase = createServerComponentClient();
+  const supabase = await createServerComponentClient();
   const currentPage = pageNum ? Number(pageNum) : 1;
 
   // start and end

@@ -13,7 +13,7 @@ export async function generateMetadata({
 }: {
   params: { locale: string; websiteName: string };
 }): Promise<Metadata> {
-  const supabase = createServerComponentClient();
+  const supabase = await createServerComponentClient();
   const t = await getTranslations({
     locale,
     namespace: 'Metadata.ai',
@@ -31,7 +31,7 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params: { websiteName } }: { params: { websiteName: string } }) {
-  const supabase = createServerComponentClient();
+  const supabase = await createServerComponentClient();
   const t = await getTranslations('Startup.detail');
   const { data: dataList } = await supabase.from('web_navigation').select().eq('name', websiteName);
   if (!dataList) {

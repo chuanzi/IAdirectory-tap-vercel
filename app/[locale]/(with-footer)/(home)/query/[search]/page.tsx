@@ -31,7 +31,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 export const revalidate = RevalidateOneHour / 2;
 
 export default async function Page({ params }: { params: { search?: string } }) {
-  const supabase = createServerComponentClient();
+  const supabase = await createServerComponentClient();
   const t = await getTranslations('Home');
   const { data: categoryList } = await supabase.from('navigation_category').select();
   const { data: dataList } = await supabase

@@ -48,8 +48,8 @@ const getEnglishContent = (content?: string): string => {
 };
 
 export async function generateMetadata({ params }: { params: { code: string } }): Promise<Metadata> {
-  const supabase = createServerComponentClient();
-  const { data: categoryList } = await supabase.from('navigation_category').select().eq('name', params.code);
+  const supabaseClient = await createServerComponentClient();
+  const { data: categoryList } = await supabaseClient.from('navigation_category').select().eq('name', params.code);
 
   if (!categoryList || !categoryList[0]) {
     notFound();
@@ -65,14 +65,15 @@ export async function generateMetadata({ params }: { params: { code: string } })
 }
 
 export default async function Page({ params }: { params: { code: string } }) {
-  const supabase = createServerComponentClient();
+  const supabaseClient = await createServerComponentClient();
   const [{ data: categoryList }, { data: navigationList, count }] = await Promise.all([
-    supabase.from('navigation_category').select().eq('name', params.code),
-    supabase
+    supabaseClient.from('navigation_category').select().eq('name', params.code),
+    supabaseClient
       .from('web_navigation')
       .select('*', { count: 'exact' })
-      .eq('category_name', params.code)
-      .range(0, InfoPageSize - 1),
+      .eq('category', params.code)
+      .order('collection_time', { ascending: false })
+      .range(0, 11),
   ]);
 
   if (!categoryList || !categoryList[0]) {

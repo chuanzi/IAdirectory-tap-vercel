@@ -24,16 +24,20 @@ export async function generateMetadata({ params }: { params: { code: string; pag
 }
 
 export default async function Page({ params }: { params: { code: string; pageNum?: string } }) {
-  const supabase = createServerComponentClient();
+  const supabaseClient = await createServerComponentClient();
   const currentPage = Number(params?.pageNum || 1);
 
+  const startIndex = (currentPage - 1) * InfoPageSize;
+  const endIndex = startIndex + InfoPageSize - 1;
+
   const [{ data: categoryList }, { data: navigationList, count }] = await Promise.all([
-    supabase.from('navigation_category').select().eq('name', params.code),
-    supabase
+    supabaseClient.from('navigation_category').select().eq('name', params.code),
+    supabaseClient
       .from('web_navigation')
       .select('*', { count: 'exact' })
-      .eq('category_name', params.code)
-      .range(0, InfoPageSize - 1),
+      .eq('category', params.code)
+      .order('collection_time', { ascending: false })
+      .range(startIndex, endIndex),
   ]);
 
   if (!categoryList || !categoryList[0]) {
