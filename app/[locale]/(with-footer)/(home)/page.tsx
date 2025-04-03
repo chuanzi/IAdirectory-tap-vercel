@@ -60,8 +60,10 @@ export async function generateMetadata({ params: { locale } }: { params: { local
     namespace: 'Metadata.home',
   });
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://tap4.ai';
+
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL as string),
+    metadataBase: new URL(siteUrl),
     title: t('title'),
     description: t('description'),
     keywords: t('keywords'),
